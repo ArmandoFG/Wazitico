@@ -10,7 +10,7 @@
    [else (cond
            [(equal? #t (bool-origen origen grafo)) ;Revisa que el origen exista
             (cond
-              [(equal? #t (bool-hijos origen grafo)) (qs (Busqueda origen destino grafo '() '() '() '() '()))] ;Revisa que el origen tenga rutas
+              [(equal? #t (bool-hijos origen grafo)) (Busqueda origen destino grafo '() '() '() '() '())] ;Revisa que el origen tenga rutas
               [else "Origen no tiene mas rutas"])]
            [else "Origen no existe"])]))
 
@@ -131,27 +131,4 @@
                     (if (null? X)
                         Y
                         (cons (car X) (concatena (cdr X) Y))))
-
-
-;Ordena los elementos de menor a mayor con quicksort
-(define (qs list)
-  (if (null? list) '()
-  (concatena
-   (concatena
-    (qs (menor (caar list) (cdr list))) (cons (car list) '())) (qs (mayor(caar list) (cdr list)))))
-  )
-
-(define(mayor x list);ordena los mayores de la lista
-  (if (null? list)
-      '()
-  (if (< x (caar list))
-      (cons (car list) (mayor x (cdr list)))
-      (mayor x (cdr list)))))
-
-(define(menor x list);ordena los menores de la lista
-  (if (null? list)
-      '()
-  (if (>= x (caar list))
-      (cons (car list) (menor x (cdr list)))
-      (menor x (cdr list)))))
 
