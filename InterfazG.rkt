@@ -53,7 +53,7 @@
 (send mainwindow show #t)
 
 
-
+;-------------------------------------------------------------------------------------
 
 
 ;Funcion que llama a la ventana que dibuja el grafo
@@ -90,9 +90,28 @@
             (resultado)))
            (control))))
 
-;Llama la ventana con el resultado
+
+
+;Funcion que dibuja los resultados de la ruta
+(define (resRutas lista num)
+  (cond
+    ((null? lista)((draw-string ventana)(make-posn 15 (+ num 40)) "Ruta obtenida"))
+    (else
+     ((draw-string ventana)(make-posn 15 (+ num 40)) (~a(car lista)))
+     (resRutas (cdr lista)(+ num 40))
+     ))
+  
+  )
+
+
+
+;Llama la ventana con el resultado (**SOLO ESTA DE PRUEBA**)
 (define (resultado)
-  ((draw-solid-rectangle ventana)(make-posn 10 110) 97 70 "white")
+  ((draw-solid-rectangle ventana)(make-posn 10 110) 97 240 "white")
+
+
+  (resRutas (buscar 'A 'C '((A (B 5) (C 7) (J 6)) (B (C 5)) (J (B 3) (D 7) (C 9)))) 90)
+  
   ;(send resWindow show #t)
   ;(set! prueba 2)
   )
