@@ -1,5 +1,6 @@
 #lang racket/gui
 
+(provide buscar)
 ;(buscar 'B 'C '((A (B 5) (C 7) (J 6)) (B (C 5) (J 7)) (J (A 6) (B 3) (D 7) (C 9))))
 
 
@@ -11,7 +12,7 @@
    [else (cond
            [(equal? #t (bool-origen origen grafo)) ;Revisa que el origen exista
             (cond
-              [(equal? #t (bool-hijos origen grafo)) (Busqueda origen destino grafo '() '() '() '() '())] ;Revisa que el origen tenga rutas
+              [(equal? #t (bool-hijos origen grafo)) (qs(Busqueda origen destino grafo '() '() '() '() '()))] ;Revisa que el origen tenga rutas
               [else "Origen no tiene mas rutas"])]
            [else "Origen no existe"])]))
 
@@ -165,4 +166,25 @@
 (define (unir vecinos lista costo resultado)
   (cons (cons costo (concatena (reverse vecinos) lista)) resultado))
 
+;quicksort para ordenar los elementos
+(define (qs list)
+  (if (null? list) '()
+  (concatena
+   (concatena
+    (qs (menor (caar list) (cdr list))) (cons (car list) '())) (qs (mayor(caar list) (cdr list)))))
+  )
+
+(define(mayor x list);mayores de la lista
+  (if (null? list)
+      '()
+  (if (< x (caar list))
+      (cons (car list) (mayor x (cdr list)))
+      (mayor x (cdr list)))))
+
+(define(menor x list);menores de la lista
+  (if (null? list)
+      '()
+  (if (>= x (caar list))
+      (cons (car list) (menor x (cdr list)))
+      (menor x (cdr list)))))
 
