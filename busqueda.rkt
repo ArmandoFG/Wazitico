@@ -1,6 +1,7 @@
 #lang racket/gui
 
-;(buscar 'A 'C '((A (B 5) (C 7) (J 6)) (B (C 5)) (J (B 3) (D 7) (C 9))))
+;(buscar 'B 'C '((A (B 5) (C 7) (J 6)) (B (C 5) (J 7)) (J (A 6) (B 3) (D 7) (C 9))))
+
 
 ;Revisa si el grafo no está vacio
 
@@ -10,7 +11,7 @@
    [else (cond
            [(equal? #t (bool-origen origen grafo)) ;Revisa que el origen exista
             (cond
-              [(equal? #t (bool-hijos origen grafo)) (qs (Busqueda origen destino grafo '() '() '() '() '()))] ;Revisa que el origen tenga rutas
+              [(equal? #t (bool-hijos origen grafo)) (Busqueda origen destino grafo '() '() '() '() '())] ;Revisa que el origen tenga rutas
               [else "Origen no tiene mas rutas"])]
            [else "Origen no existe"])]))
 
@@ -19,7 +20,7 @@
 (define (Busqueda g_origen g_destino grafo vecinos ruta costo visitados resultado)
   (cond
        [(equal? g_origen g_destino) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta costo visitados (cons (agregar-resultado (agregar-elemento g_origen vecinos) costo) resultado))]
-      ; [(equal? #t (analizado g_origen visitados)) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta costo visitados resultado)]
+       [(equal? #t (analizado g_origen visitados)) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta costo visitados resultado)]
        [(equal? #t (bool-hijos g_origen grafo)) (Busqueda (primer-hijo g_origen grafo) g_destino grafo (agregar-elemento g_origen vecinos) (concatena (hijos-origen g_origen grafo) ruta) (agregar-elemento (obtener-costo (primer-hijo g_origen grafo) (obtener-lista-hijos g_origen grafo)) costo) (agregar-elemento g_origen visitados) resultado)]
        [(equal? #f (bool-hijos g_origen grafo))
         (cond
@@ -32,7 +33,7 @@
   (cond
     [(null? ruta) resultado]
     [(equal? (car vecinos) (car ruta)) (Borrado (ultimo ruta) g_destino grafo (cdr vecinos) (cdr ruta) (cdr costo) visitados  resultado)]
-   ; [(equal? #t (analizado g_origen visitados)) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta costo visitados resultado)]
+    [(equal? #t (analizado g_origen visitados)) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo) visitados (resultados_calculados grafo g_origen vecinos (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo) resultado resultado))]
     [(equal? g_origen g_destino) (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo) visitados (cons (agregar-resultado (agregar-elemento g_origen vecinos) (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo)) resultado))]
     [(equal? #t (bool-origen g_origen grafo)) (Busqueda g_origen g_destino grafo vecinos ruta (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo) visitados resultado)]
     [else (Borrado g_origen g_destino grafo (agregar-elemento g_origen vecinos) ruta (agregar-elemento (obtener-costo g_origen (obtener-lista-hijos (car vecinos) grafo)) costo) visitados resultado)]))
@@ -132,26 +133,36 @@
                         Y
                         (cons (car X) (concatena (cdr X) Y))))
 
+;Metodo principal para buscar resultados ya obtenidos en un grafo y no volver a recorrer
 
-;Ordena los elementos de menor a mayor con quicksort
-(define (qs list)
-  (if (null? list) '()
-  (concatena
-   (concatena
-    (qs (menor (caar list) (cdr list))) (cons (car list) '())) (qs (mayor(caar list) (cdr list)))))
-  )
+(define (resultados_calculados grafo inicio vecinos costos resultados resultado_final)
+  (cond
+    [(null? resultados) resultado_final]
+    [(equal? #t (recorrer (car resultados) inicio)) (resultados_calculados grafo inicio vecinos costos (cdr resultados) (unir vecinos (resto_del_camino inicio (car resultados)) (+ (sumar-costos costos) (costo_calculados grafo (resto_del_camino inicio (car resultados)) 0)) resultado_final))]
+    [else (resultados_calculados grafo inicio vecinos costos (cdr resultados) resultado_final)]))
 
-(define(mayor x list);ordena los mayores de la lista
-  (if (null? list)
-      '()
-  (if (< x (caar list))
-      (cons (car list) (mayor x (cdr list)))
-      (mayor x (cdr list)))))
+; Obtiene parte del camino de la solucion ya obtenida
+(define (resto_del_camino origen lista)
+  (cond
+    [(equal? (car lista) origen) lista]
+    [else (resto_del_camino origen (cdr lista))]))
 
-(define(menor x list);ordena los menores de la lista
-  (if (null? list)
-      '()
-  (if (>= x (caar list))
-      (cons (car list) (menor x (cdr list)))
-      (menor x (cdr list)))))
+;Comprueba que el grafo de interés tenga un resultado agregado en la lista de resultados
+(define (recorrer lista inicio)
+  (cond
+    [(null? lista) #f]
+    [(equal? (car lista) inicio) #t]
+    [else (recorrer (cdr lista) inicio)]))
+
+;Suma el costo de las aristas del camino encontrado
+
+(define (costo_calculados grafo lista resultado)
+  (cond
+    [(null? (cdr lista)) resultado]
+    [else (costo_calculados grafo (cdr lista) (+ (obtener-costo (car(cdr lista)) (obtener-lista-hijos (car lista) grafo)) resultado))]))
+
+;Une las respuesta encontrada con los resultados ya obtenidos
+(define (unir vecinos lista costo resultado)
+  (cons (cons costo (concatena (reverse vecinos) lista)) resultado))
+
 
