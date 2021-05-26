@@ -27,9 +27,6 @@
 (define nin '())
 (define nde '())
 
-;(wazitico 'A 'C '((A (B 5) (C 7) (J 6)) (B (C 5)) (J (B 3) (D 7) (C 9))))
-
-
 ;Ventana Inicial
 
 
@@ -48,10 +45,8 @@
 
   ((draw-solid-rectangle ventana)(make-posn 10 10) 97 40 "gray")
   ((draw-solid-rectangle ventana)(make-posn 10 60) 97 40 "gray")
-  ;((draw-line ventana)(make-posn 10 10) (make-posn 107 50)"red")
   ((draw-string ventana)(make-posn 20 35) "Calcular ruta")
   (cond
-    ;((equal? (length grafo) 1)"Error inserte al menos 2 nodos")
     ((equal? (length grafo) 2)(dosNodos)(arc grafo))
     ((equal? (length grafo) 3)(tresNodos)(arc grafo))
     ((equal? (length grafo) 4)(cuatroNodos)(arc grafo))
@@ -73,7 +68,7 @@
            (control))))
 
 
-;Llama la ventana con el resultado (**SOLO ESTA DE PRUEBA**)
+;Llama la ventana con el resultado
 (define (resultado ni nf arcos)
   ((draw-solid-rectangle ventana)(make-posn 10 110) 150 350 "white")
 
@@ -90,7 +85,6 @@
      ((draw-string ventana)(make-posn 15 (+ num 40)) (~a(car lista)))
      (resRutas (cdr lista)(+ num 40))
      ))
-  
   )
 
 
@@ -185,7 +179,7 @@
 
   )
 
-;funcion que dibuja los arcos
+;funcion que busca si hay que dibujar un arco
 (define (arc grf)
   (cond
     ((null? grf)'())
@@ -196,6 +190,7 @@
     ((equal? (caar grf) lb5)(arcAux1 (cdar grf) circulo5 "violet")(arc (cdr grf)))   
     ))
 
+;Funcion que dibuja el arco desde un punto inicial dado
 (define (arcAux1 vec circ color)
   (cond
     ((null? vec)'())
